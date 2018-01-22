@@ -56,11 +56,12 @@ test('\nescapeString: valid values backslash not supported', function(t) {
   , [ 'Sup\u001aer', "'Sup\u001aer'" ]
   , [ 'Super\u001a', "'Super\u001a'" ]
   , [ 'Sup\'er', "'Sup''er'" ]
+  , [ 'Sup\'e\'r', "'Sup''e''r'" ]
   , [ 'Super\'', "'Super'''" ]
   // eslint-disable-next-line no-useless-escape
-  , [ 'Sup"er', "'Sup\"\"er'" ]
+  , [ 'Sup"er', "'Sup\"er'" ]
   // eslint-disable-next-line no-useless-escape
-  , [ 'Super"', "'Super\"\"'" ]
+  , [ 'Super"', "'Super\"'" ]
 
   ].forEach(function check(xs) {
     const s = xs[0]
