@@ -1,6 +1,6 @@
 {
   "name": "sql-escape-string",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Simple SQL string escape.",
   "main": "sql-escape-string.js",
   "scripts": {
@@ -15,7 +15,12 @@
   "devDependencies": {
     "tape": "^4.8.0"
   },
-  "keywords": [ "sql", "escape", "injection", "security" ],
+  "keywords": [
+    "sql",
+    "escape",
+    "injection",
+    "security"
+  ],
   "author": {
     "name": "Thorsten Lorenz",
     "email": "thlorenz@gmx.de",
