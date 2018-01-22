@@ -32,8 +32,8 @@ Quoting from the [SQLlite web site](https://sqlite.org/lang_expr.html):
 
 This means three things:
 
--   backslashes are not escaped by default
--   single quotes are escaped via `''` instead of `\'` and double quotes via `""` instead of `\"`
+-   backslashes and double quotes `"` are not escaped by default
+-   single quotes are escaped via `''` instead of `\'`
 -   your sql engine should throw an error when encountering a backslash escape
     as part of a string, unless it is a literal backslash, i.e. `'backslash: \\'`.
 
@@ -48,7 +48,7 @@ and double quotes are escaped via a backslash, i.e. `'\''`.
     -   `$0.backslashSupported` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if `true` backslashes are supported (optional, default `false`)
 -   `opts`  
 
-Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the original string escaped and safe to use
+Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the original string escaped wrapped in single quotes, i.e. `'mystring'`
 
 ## License
 

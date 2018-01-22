@@ -1,11 +1,5 @@
 'use strict'
 
-const CHARS_GLOBAL_RX = /["']/g
-const CHARS_ESCAPE_MAP = {
-    '"'    : '""'
-  , '\''   : '\'\''
-}
-
 // eslint-disable-next-line no-control-regex
 const CHARS_GLOBAL_BACKSLASH_SUPPORTED_RX = /[\0\b\t\n\r\x1a"'\\]/g
 const CHARS_ESCAPE_BACKSLASH_SUPPORTED_MAP = {
@@ -30,8 +24,8 @@ const CHARS_ESCAPE_BACKSLASH_SUPPORTED_MAP = {
  *
  * This means three things:
  *
- * - backslashes are not escaped by default
- * - single quotes are escaped via `''` instead of `\'` and double quotes via `""` instead of `\"`
+ * - backslashes and double quotes `"` are not escaped by default
+ * - single quotes are escaped via `''` instead of `\'`
  * - your sql engine should throw an error when encountering a backslash escape
  *   as part of a string, unless it is a literal backslash, i.e. `'backslash: \\'`.
  *
@@ -42,7 +36,7 @@ const CHARS_ESCAPE_BACKSLASH_SUPPORTED_MAP = {
  * @param {String} val the original string to be used in a SQL query
  * @param {Object} $0 opts
  * @param {Boolean} [$0.backslashSupported = false] if `true` backslashes are supported
- * @returns {String} the original string escaped and safe to use
+ * @returns {String} the original string escaped wrapped in single quotes, i.e. `'mystring'`
  */
 function escapeString(val, opts) {
   if (val == null) {
@@ -50,8 +44,11 @@ function escapeString(val, opts) {
   }
   opts = opts || {}
   const backslashSupported = !!opts.backslashSupported
-  const charsRx = backslashSupported ? CHARS_GLOBAL_BACKSLASH_SUPPORTED_RX : CHARS_GLOBAL_RX
-  const charsEscapeMap = backslashSupported ? CHARS_ESCAPE_BACKSLASH_SUPPORTED_MAP : CHARS_ESCAPE_MAP
+
+  if (!backslashSupported) return "'" + val.replace(/'/g, "''") + "'"
+
+  const charsRx = CHARS_GLOBAL_BACKSLASH_SUPPORTED_RX
+  const charsEscapeMap = CHARS_ESCAPE_BACKSLASH_SUPPORTED_MAP
   var chunkIndex = charsRx.lastIndex = 0
   var escapedVal = ''
   var match
