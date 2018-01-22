@@ -15,7 +15,7 @@
   "devDependencies": {
     "tape": "^4.8.0"
   },
-  "keywords": [],
+  "keywords": [ "sql", "escape", "injection", "security" ],
   "author": {
     "name": "Thorsten Lorenz",
     "email": "thlorenz@gmx.de",
