@@ -1,12 +1,14 @@
 {
   "name": "sql-escape-string",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Simple SQL string escape.",
   "main": "sql-escape-string.js",
   "scripts": {
     "test": "tape test/*.js"
   },
-  "files": [ "sql-escape-string.js" ],
+  "files": [
+    "sql-escape-string.js"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/thlorenz/sql-escape-string.git"
