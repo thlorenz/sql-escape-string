@@ -4,8 +4,8 @@ Simple SQL string escape.
 
 ```js
 const escapeString = require('sql-string-escape')
-const sqlString = 'Sup\ter'
-console.log(escapeString(sqlString)) // => Sup\\ter
+const sqlString = "Sup'er"
+console.log(escapeString(sqlString)) // => Sup''er
 ```
 
 ## Installation
@@ -14,18 +14,8 @@ console.log(escapeString(sqlString)) // => Sup\\ter
 
 ## Note
 
-Implementation lifted from [sqlstring](https://github.com/mysqljs/sqlstring) with some
-adaptations.
-
--   adapted method is private inside the above module so it cannot be accessed directly there
--   instead you'll have to call `SqlString.escape` which does a bunch of checks to support
-    passing `Array`s, `Object`s, etc.
--   here it is exposed directly and thus changed as follows:
-    -   passing `null` or `undefined` throws
-    -   the passed string is not wrapped in quotes, instead only characters inside it are escaped,
-        however if you need that to happen I recommend using [full featured
-        escaping](https://github.com/mysqljs/sqlstring#escaping-query-values) provided by
-        `sqlstring`.
+Original implementation from [sqlstring](https://github.com/mysqljs/sqlstring) with the added
+option of supporting or not supporting backslash. 
 
 ## [API](https://thlorenz.github.io/sql-escape-string)
 
@@ -33,18 +23,30 @@ adaptations.
 
 ### escapeString
 
-Escapes the given string to protect against SQL injection attacks'
+Escapes the given string to protect against SQL injection attacks.
 
-NOTE: the string is not quoted after it is escaped, therefore either use parameterized
-queries and/or process it further via modules like [squel](https://github.com/hiddentao/squel)
+By default it assumes that backslashes are not supported as they are not part of the standard SQL spec.
+Quoting from the [SQLlite web site](https://sqlite.org/lang_expr.html):
 
-NOTE for MYSQL users: These methods of escaping values only works when the
-[NO_BACKSLASH_ESCAPES](https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sqlmode_no_backslash_escapes)
-SQL mode is disabled (which is the default state for MySQL servers)
+> C-style escapes using the backslash character are not supported because they are not standard SQL.
+
+This means three things:
+
+-   backslashes are not escaped by default
+-   single quotes are escaped via `''` instead of `\'` and double quotes via `""` instead of `\"`
+-   your sql engine should throw an error when encountering a backslash escape
+    as part of a string, unless it is a literal backslash, i.e. `'backslash: \\'`.
+
+It is recommended to set the `backslashSupported` option `true` if your SQL
+engine supports it. In that case backslash sequences are escaped and single
+and double quotes are escaped via a backslash, i.e. `'\''`.
 
 **Parameters**
 
 -   `val` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the original string to be used in a SQL query
+-   `$0` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** opts
+    -   `$0.backslashSupported` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if `true` backslashes are supported (optional, default `false`)
+-   `opts`  
 
 Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the original string escaped and safe to use
 

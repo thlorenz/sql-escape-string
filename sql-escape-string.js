@@ -1,8 +1,14 @@
 'use strict'
 
-// eslint-disable-next-line no-control-regex, no-useless-escape
-const CHARS_GLOBAL_REGEXP = /[\0\b\t\n\r\x1a\"\'\\]/g
+const CHARS_GLOBAL_RX = /["']/g
 const CHARS_ESCAPE_MAP = {
+    '"'    : '""'
+  , '\''   : '\'\''
+}
+
+// eslint-disable-next-line no-control-regex
+const CHARS_GLOBAL_BACKSLASH_SUPPORTED_RX = /[\0\b\t\n\r\x1a"'\\]/g
+const CHARS_ESCAPE_BACKSLASH_SUPPORTED_MAP = {
     '\0'   : '\\0'
   , '\b'   : '\\b'
   , '\t'   : '\\t'
@@ -15,36 +21,51 @@ const CHARS_ESCAPE_MAP = {
 }
 
 /**
- * Escapes the given string to protect against SQL injection attacks'
+ * Escapes the given string to protect against SQL injection attacks.
  *
- * NOTE: the string is not quoted after it is escaped, therefore either use parameterized
- * queries and/or process it further via modules like [squel](https://github.com/hiddentao/squel)
+ * By default it assumes that backslashes are not supported as they are not part of the standard SQL spec.
+ * Quoting from the [SQLlite web site](https://sqlite.org/lang_expr.html):
  *
- * NOTE for MYSQL users: These methods of escaping values only works when the
- * [NO_BACKSLASH_ESCAPES](https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sqlmode_no_backslash_escapes)
- * SQL mode is disabled (which is the default state for MySQL servers)
+ * > C-style escapes using the backslash character are not supported because they are not standard SQL.
+ *
+ * This means three things:
+ *
+ * - backslashes are not escaped by default
+ * - single quotes are escaped via `''` instead of `\'` and double quotes via `""` instead of `\"`
+ * - your sql engine should throw an error when encountering a backslash escape
+ *   as part of a string, unless it is a literal backslash, i.e. `'backslash: \\'`.
+ *
+ * It is recommended to set the `backslashSupported` option `true` if your SQL
+ * engine supports it. In that case backslash sequences are escaped and single
+ * and double quotes are escaped via a backslash, i.e. `'\''`.
  *
  * @param {String} val the original string to be used in a SQL query
+ * @param {Object} $0 opts
+ * @param {Boolean} [$0.backslashSupported = false] if `true` backslashes are supported
  * @returns {String} the original string escaped and safe to use
  */
-function escapeString(val) {
+function escapeString(val, opts) {
   if (val == null) {
     throw new Error('Need to pass a valid string')
   }
-  var chunkIndex = CHARS_GLOBAL_REGEXP.lastIndex = 0
+  opts = opts || {}
+  const backslashSupported = !!opts.backslashSupported
+  const charsRx = backslashSupported ? CHARS_GLOBAL_BACKSLASH_SUPPORTED_RX : CHARS_GLOBAL_RX
+  const charsEscapeMap = backslashSupported ? CHARS_ESCAPE_BACKSLASH_SUPPORTED_MAP : CHARS_ESCAPE_MAP
+  var chunkIndex = charsRx.lastIndex = 0
   var escapedVal = ''
   var match
 
-  while ((match = CHARS_GLOBAL_REGEXP.exec(val))) {
-    escapedVal += val.slice(chunkIndex, match.index) + CHARS_ESCAPE_MAP[match[0]]
-    chunkIndex = CHARS_GLOBAL_REGEXP.lastIndex
+  while ((match = charsRx.exec(val))) {
+    escapedVal += val.slice(chunkIndex, match.index) + charsEscapeMap[match[0]]
+    chunkIndex = charsRx.lastIndex
   }
 
   // Nothing was escaped
-  if (chunkIndex === 0) return val
+  if (chunkIndex === 0) return "'" + val + "'"
 
-  if (chunkIndex < val.length) return escapedVal + val.slice(chunkIndex)
-  return escapedVal
+  if (chunkIndex < val.length) return "'" + escapedVal + val.slice(chunkIndex) + "'"
+  return "'" + escapedVal + "'"
 }
 
 module.exports = escapeString

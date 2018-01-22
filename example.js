@@ -1,3 +1,3 @@
 const escapeString = require('./')
-const sqlString = 'Sup\ter'
-console.log(escapeString(sqlString)) // => Sup\\ter
+const sqlString = "Sup'er"
+console.log(escapeString(sqlString)) // => Sup''er

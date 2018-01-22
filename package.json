@@ -6,6 +6,7 @@
   "scripts": {
     "test": "tape test/*.js"
   },
+  "files": [ "sql-escape-string.js" ],
   "repository": {
     "type": "git",
     "url": "git://github.com/thlorenz/sql-escape-string.git"
