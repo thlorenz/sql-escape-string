@@ -3,7 +3,7 @@
 Simple SQL string escape.
 
 ```js
-const escapeString = require('sql-string-escape')
+const escapeString = require('sql-escape-string')
 const sqlString = "Sup'er"
 console.log(escapeString(sqlString)) // => Sup''er
 ```
